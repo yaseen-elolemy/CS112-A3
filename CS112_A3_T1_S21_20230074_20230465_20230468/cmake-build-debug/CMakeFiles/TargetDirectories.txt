@@ -1,0 +1,3 @@
+C:/C++ Projects/CS112_A3_T1_S21_20230074_20230465_20230468/cmake-build-debug/CMakeFiles/image_task.dir
+C:/C++ Projects/CS112_A3_T1_S21_20230074_20230465_20230468/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/C++ Projects/CS112_A3_T1_S21_20230074_20230465_20230468/cmake-build-debug/CMakeFiles/rebuild_cache.dir
