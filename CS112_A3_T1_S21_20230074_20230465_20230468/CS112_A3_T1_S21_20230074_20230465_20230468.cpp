@@ -5,7 +5,7 @@ Purpose: This is a program that allows the user to load an image, apply filters 
                  The filters are: rotate, invert, convert to grayscale, darken or lighten, and convert to black and white.
                 The user can choose to load a new image, apply a filter to the current image, save the current image, or exit the program.
 
- Author:    Eyad Tamer Naguib 20230074 - S21 -> Grayscale and Darken/Lighten Functions
+ Author:    Eyad Tamer Naguib 20230074 - S21 -> Grayscale - Darken/Lighten - Detect Edges - purple filter - Merge Images Functions
             Yassin Ahmed Ali 20230465 - S21 -> Flipping the image and Convert to Black and White Function
             Yaseen Mohamed Kamal 20230468 - S21  ->  Invert the color Functions
 
@@ -16,6 +16,140 @@ Purpose: This is a program that allows the user to load an image, apply filters 
 #include <bits/stdc++.h>
 #include "Image_Class.h"
 using namespace std;
+
+
+Image resize_image_for_merge(Image &image, int newWidth, int newHeight)
+{
+
+    // Create a new Image object with the specified width and height
+    Image newImage(newWidth, newHeight);
+
+    // Calculate the scaling factors for the width and height
+    double scaleX = static_cast<double>(image.width) / newWidth;
+    double scaleY = static_cast<double>(image.height) / newHeight;
+
+    // Loop over each pixel in the new image
+    for (int i = 0; i < newWidth; ++i) {
+        for (int j = 0; j < newHeight; ++j) {
+            // Calculate the corresponding pixel coordinates in the original image
+            int x = static_cast<int>(i * scaleX);
+            int y = static_cast<int>(j * scaleY);
+
+            // Copy the pixel data from the original image to the new image
+            for (int k = 0; k < image.channels; ++k) {
+                newImage.setPixel(i, j, k, image.getPixel(x, y, k));
+            }
+        }
+    }
+    return newImage;
+
+}
+
+
+void mergeImages(Image& image1) {
+    string image2_name;
+    cout << "Please enter the directory or the name of the second image you want to merge with the first image\n";
+    cout<<"with the format .jpg, .bmp, .png, .tga: ";
+    cin >> image2_name;
+    // Load the second image
+    Image image2(image2_name);
+
+    // Check if images have different dimensions
+    if (image1.width != image2.width || image1.height != image2.height) {
+        int merge_option;
+        cout<<"The images have different dimensions. Please choose an option to resize the images:"<<endl;
+        cout<<"1. Resize both images to the largest dimensions"<<endl;
+        cout<<"2. Resize both images to the smallest dimensions"<<endl;
+        cout<<"Please enter your choice: ";
+
+        while (!(cin >> merge_option) || (merge_option < 1 || merge_option > 2))
+        {
+            cout << "Invalid option. Please try again." << endl;
+            // Clear the error flags
+            cin.clear();
+            // Ignore the rest of the line
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+
+        if(merge_option==1) {
+            // Option 1: Resize both images to the largest dimensions
+            int maxWidth = max(image1.width, image2.width);
+            int maxHeight = max(image1.height, image2.height);
+            resize_image_for_merge(image1, maxWidth, maxHeight);
+            resize_image_for_merge(image2, maxWidth, maxHeight);
+        }
+        else if(merge_option==2) {
+            // Option 2: Resize both images to the smallest dimensions
+            int minWidth = min(image1.width, image2.width);
+            int minHeight = min(image1.height, image2.height);
+            resize_image_for_merge(image1, minWidth, minHeight);
+            resize_image_for_merge(image2, minWidth, minHeight);
+        }
+    }
+
+
+    // Merge the images
+    // For simplicity, let's just blend the images by averaging pixel values
+    for (int i = 0; i < image1.width; i++) {
+        for (int j = 0; j < image1.height; j++) {
+            for (int k = 0; k < image1.channels; k++) {
+                // Blend pixel values from both images
+                int pixelValue = (image1.getPixel(i, j, k) + image2.getPixel(i, j, k)) / 2;
+                // Set merged pixel value to the first image
+                image1.setPixel(i, j, k, pixelValue);
+            }
+        }
+    }
+}
+
+void purpleFilter(Image &image) {   //By Eyad Tamer Naguib: 20230074
+    for (int i = 0; i < image.width; ++i) {
+        for (int j = 0; j < image.height; ++j) {
+            // Get the original colors of the pixel
+            int red = image.getPixel(i, j, 0);
+            int blue = image.getPixel(i, j, 2);
+
+            // Add purple tint
+            red += 128;  // Increase red
+            blue += 128; // Increase blue
+
+            // Ensure color values are within valid range (0-255)
+            red = min(255, max(0, red));
+            blue = min(255, max(0, blue));
+
+            // Set the new colors of the pixel
+            image.setPixel(i, j, 0, red);
+            image.setPixel(i, j, 2, blue);
+        }
+    }
+}
+
+
+void detect_edges(Image& image) //By Eyad Tamer Naguib: 20230074
+{
+    for(int i = 0; i<image.width;i++)
+    {
+        for(int j = 0; j<image.height;j++)
+        {
+            for(int k = 0;k<3;k++)
+            {
+                // Get the current color value
+                unsigned int color = image(i,j,k);
+                // Get the color value of the pixel to the right
+                unsigned int right = image(i+1,j,k);
+                // Get the color value of the pixel below
+                unsigned int below = image(i,j+1,k);
+                // Calculate the difference between the current pixel and the pixel to the right
+                int diff1 = abs((int)color - (int)right);
+                // Calculate the difference between the current pixel and the pixel below
+                int diff2 = abs((int)color - (int)below);
+                // Set the pixel to black if the difference is greater than 50, otherwise set it to white
+                image.setPixel(i,j,k,(diff1 > 50 || diff2 > 50) ? 0 : 255);
+            }
+        }
+    }
+}
+
 
 void flipImage(Image& image) {  //By Yassin Ahmed Ali: 20230465
     int flipOption;
@@ -195,36 +329,6 @@ void crop(Image &image, int x, int y, int width, int height)   // By Yassin Ahme
 
 }
 
-void resize(Image &image, int newWidth, int newHeight)  // By Yassin Ahmed Ali: 20230465
-{
-    // Check if the new dimensions are valid
-    if (newWidth <= 0 || newHeight <= 0) {
-        cout << "Invalid image dimensions." << endl;
-        return;
-    }
-
-    // Create a new Image object with the specified width and height
-    Image newImage(newWidth, newHeight);
-
-    // Calculate the scaling factors for the width and height
-    double scaleX = static_cast<double>(image.width) / newWidth;
-    double scaleY = static_cast<double>(image.height) / newHeight;
-
-    // Loop over each pixel in the new image
-    for (int i = 0; i < newWidth; ++i) {
-        for (int j = 0; j < newHeight; ++j) {
-            // Calculate the corresponding pixel coordinates in the original image
-            int x = static_cast<int>(i * scaleX);
-            int y = static_cast<int>(j * scaleY);
-
-            // Copy the pixel data from the original image to the new image
-            for (int k = 0; k < image.channels; ++k) {
-                newImage.setPixel(i, j, k, image.getPixel(x, y, k));
-            }
-        }
-    }
-
-}
 
 int main()
 {
@@ -301,15 +405,18 @@ int main()
                     break;
                 }
                 cout << "Please choose a filter to apply:" << endl;
-                cout << "1. Rotate the image" << endl;
+                cout << "1. Flip the image" << endl;
                 cout << "2. Darken or lighten the image" << endl;
                 cout << "3. Convert the image to black and white" << endl;
                 cout << "4. Invert the color of the image" << endl;
                 cout << "5. Convert the image to grayscale" << endl;
+                cout << "6. Detect edges in the image" << endl;
+                cout << "7. Merge the image with another image" << endl;
+                cout << "8. Apply a purple filter to the image" << endl;
 
                 int filterOption;
                 // Loop until a valid input is given
-                while (!(cin >> filterOption) || (filterOption < 1 || filterOption > 5))
+                while (!(cin >> filterOption) || (filterOption < 1 || filterOption > 8))
                 {
                     cout << "Invalid option. Please try again." << endl;
                     // Clear the error flags
@@ -335,6 +442,16 @@ int main()
                     case 5:
                         grayscale(*image);
                         break;
+                    case 6:
+                        detect_edges(*image);
+                        break;
+                    case 7:
+                        mergeImages(*image);
+                        break;
+                    case 8:
+                        purpleFilter(*image);
+                        break;
+
                 }
                 cout<<"Filter applied successfully!"<<endl;
                 break;
@@ -364,12 +481,14 @@ int main()
                 if (saveOption == "same")
                 {
                     image->saveImage(image_name);
+                    cout << "Image saved successfully!" << endl;
                 }
                 else if (saveOption == "new")
                 {
                     cout << "Enter the directory and name of the photo you want to save with the format .jpg, .bmp, .png, .tga: ";
                     cin >> image_name;
                     image->saveImage(image_name);
+                    cout << "Image saved successfully!" << endl;
                 }
                 break;
             }
@@ -392,12 +511,38 @@ int main()
                         // Convert the input to lowercase
                         transform(saveCurrent.begin(), saveCurrent.end(), saveCurrent.begin(), ::tolower);
                     }
+                    if (saveCurrent=="no") {
+                        goto last;
+                    }
 
                     if (saveCurrent == "yes")
                     {
-                        cout << "Enter the directory and name of the photo you want to save with the format .jpg, .bmp, .png, .tga: ";
-                        cin >> image_name;
-                        image->saveImage(image_name);
+                        cout << "Do you want to save the image in the same file or in a new file? (same/new): ";
+                        string saveOption;
+                        cin >> saveOption;
+                        // Convert the input to lowercase
+                        transform(saveOption.begin(), saveOption.end(), saveOption.begin(), ::tolower);
+                        // Loop until a valid input is given
+                        while (saveOption != "same" && saveOption != "new")
+                        {
+                            cout << "Invalid option. Please try again." << endl;
+                            cin >> saveOption;
+                            // Convert the input to lowercase
+                            transform(saveOption.begin(), saveOption.end(), saveOption.begin(), ::tolower);
+                        }
+
+                        if (saveOption == "same")
+                        {
+                            image->saveImage(image_name);
+                            cout << "Image saved successfully!" << endl;
+                        }
+                        else if (saveOption == "new")
+                        {
+                            cout << "Enter the directory and name of the photo you want to save with the format .jpg, .bmp, .png, .tga: ";
+                            cin >> image_name;
+                            image->saveImage(image_name);
+                            cout << "Image saved successfully!" << endl;
+                        }
                     }
                 }
                 last:
