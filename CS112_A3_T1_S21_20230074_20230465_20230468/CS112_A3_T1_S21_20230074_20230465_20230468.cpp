@@ -110,8 +110,6 @@ void grayscale(Image& image)
         }
     }
 }
-/*
- *needs to be modified and add the resize function to it to resize both images before merging them
 
 void merge_images (Image& image1, string saveName)
 {
@@ -130,39 +128,36 @@ void merge_images (Image& image1, string saveName)
     // Create the new image with the larger dimensions
     Image newImage(newWidth, newHeight);
 
-    // Copy the pixel data from the first image into the new image
-    for (int i = 0; i < image1.width; ++i)
+    // Scale and copy the pixel data from the first image into the new image
+    for (int i = 0; i < newWidth; ++i)
     {
-        for (int j = 0; j < image1.height; ++j)
+        for (int j = 0; j < newHeight; ++j)
         {
             for (int k = 0; k < image1.channels; ++k)
             {
-                newImage(i, j, k) = image1(i, j, k);
+                // Calculate the corresponding coordinates in the original image
+                int oldX = i * image1.width / newWidth;
+                int oldY = j * image1.height / newHeight;
+
+                // Copy the pixel data
+                newImage(i, j, k) = image1(oldX, oldY, k);
             }
         }
     }
 
-    // Calculate the starting position for the second image in the new image
-    int startX = (newWidth - image2.width) / 2;
-    int startY = (newHeight - image2.height) / 2;
-
-    // Copy the pixel data from the second image into the new image
-    for (int i = 0; i < image2.width; ++i)
+    // Scale and copy the pixel data from the second image into the new image
+    for (int i = 0; i < newWidth; ++i)
     {
-        for (int j = 0; j < image2.height; ++j)
+        for (int j = 0; j < newHeight; ++j)
         {
             for (int k = 0; k < image2.channels; ++k)
             {
-                // Calculate the coordinates in the new image
-                int newX = startX + i;
-                int newY = startY + j;
+                // Calculate the corresponding coordinates in the original image
+                int oldX = i * image2.width / newWidth;
+                int oldY = j * image2.height / newHeight;
 
-                // Check if the coordinates are within the bounds of the new image
-                if (newX >= 0 && newX < newWidth && newY >= 0 && newY < newHeight)
-                {
-                    // Average the pixel values of the two images
-                    newImage(newX, newY, k) = (newImage(newX, newY, k) + image2(i, j, k)) / 2;
-                }
+                // Average the pixel values of the two images
+                newImage(i, j, k) = (newImage(i, j, k) + image2(oldX, oldY, k)) / 2;
             }
         }
     }
@@ -170,7 +165,7 @@ void merge_images (Image& image1, string saveName)
     // Save the new image
     newImage.saveImage(saveName);
 }
-*/
+
 
 void darken_and_lighten(Image& image)
 {
@@ -287,6 +282,7 @@ int main()
             cout<<"Enter the new directory and name of the photo you want ";
             cout<<"with the format .jpg, .bmp, .png, .tga:";
             cin>>image_name;
+            merge_images(image, image_name);
             // when we activate the filters
             // we can here make a choice to the user if he wants to save the new photo with the same name and same file or new file with new name
 
