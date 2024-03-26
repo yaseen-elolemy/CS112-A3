@@ -1,9 +1,8 @@
 #include <bits/stdc++.h>
 #include "Image_Class.h"
-
 using namespace std;
 
-void rotateImage(Image& image, string saveName)     //By Yaseen El-Olemy: 20230468
+void rotateImage(Image& image)     //By Yaseen El-Olemy: 20230468
 {
     int toRotate;       //placeholder to specify
     cout<<"to rotate 90 Degrees Clockwise[1]\nto rotate 180 Degrees[2]\nto rotate 270 Degrees Clockwise[3]\n-> ";
@@ -35,7 +34,6 @@ void rotateImage(Image& image, string saveName)     //By Yaseen El-Olemy: 202304
             }
         }
 
-        inverted.saveImage(saveName);
     }
 
     if(toRotate == 2)
@@ -51,7 +49,7 @@ void rotateImage(Image& image, string saveName)     //By Yaseen El-Olemy: 202304
                 }
             }
         }
-        inverted.saveImage(saveName);
+
     }
 
     if(toRotate == 3)
@@ -68,12 +66,11 @@ void rotateImage(Image& image, string saveName)     //By Yaseen El-Olemy: 202304
             }
         }
 
-        ninetied.saveImage(saveName);
     }
 
 }
 
-void invertImage(Image& image, string saveName)     //By Yaseen El-Olemy: 20230468
+void invertImage(Image& image)     //By Yaseen El-Olemy: 20230468
 {
     for(int i =0; i < image.width; ++i)
     {
@@ -85,7 +82,6 @@ void invertImage(Image& image, string saveName)     //By Yaseen El-Olemy: 202304
             }
         }
     }
-    image.saveImage(saveName);
 }
 void grayscale(Image& image)
 {
@@ -110,8 +106,7 @@ void grayscale(Image& image)
         }
     }
 }
-
-void merge_images (Image& image1, string saveName)
+void merge_images (Image& image1)
 {
     // Prompt the user for the name of the second image
     string image2Name;
@@ -162,66 +157,7 @@ void merge_images (Image& image1, string saveName)
         }
     }
 
-    // Save the new image
-    newImage.saveImage(saveName);
 }
-
-
-void darken_and_lighten(Image& image)
-{
-    string choice;
-    cout<<"Do you want to darken or lighten the image? (darken/lighten): ";
-    cin>>choice;
-    bool darken = (choice == "darken");
-
-    for(int i = 0; i<image.width;i++)
-    {
-        for(int j = 0; j<image.height;j++)
-        {
-            for(int k = 0;k<3;k++)
-            {
-                // Get the current color value
-                unsigned int color = image(i,j,k);
-                if(darken)
-                {
-                    // Reduce the color value by 50% to darken the image
-                    image.setPixel(i,j,k,color/2);
-                }
-                else
-                {
-                    // Increase the color value by 50% to lighten the image, but not exceeding 255
-                    image.setPixel(i,j,k,min(color + color/2, (unsigned int)255));
-                }
-            }
-        }
-    }
-}
-
-void detect_edges(Image& image)
-{
-    for(int i = 0; i<image.width;i++)
-    {
-        for(int j = 0; j<image.height;j++)
-        {
-            for(int k = 0;k<3;k++)
-            {
-                // Get the current color value
-                unsigned int color = image(i,j,k);
-                // Get the color value of the pixel to the right
-                unsigned int right = image(i+1,j,k);
-                // Get the color value of the pixel below
-                unsigned int below = image(i,j+1,k);
-                // Calculate the difference between the current pixel and the pixel to the right
-                int diff1 = abs((int)color - (int)right);
-                // Calculate the difference between the current pixel and the pixel below
-                int diff2 = abs((int)color - (int)below);
-                // Set the pixel to black if the difference is greater than 50, otherwise set it to white
-                image.setPixel(i,j,k,(diff1 > 50 || diff2 > 50) ? 0 : 255);
-            }
-        }
-    }
-}
-
 void convertToBlackandWhite(Image& image)
 {
     for(int i = 0; i<image.width;i++)
@@ -256,39 +192,163 @@ void convertToBlackandWhite(Image& image)
     }
 }
 
+
+
 int main()
 {
-    string image_name_before, image_name;
+    string image_name_before, image_name_after;
     cout<<"Welcome to Editing Photo Program"<<endl;
-    while(image_name_before != "exit")
+    while(true)
     {
-
-        /*
-             cout<<"PLs choose the filter you want: ";
-             here we will insert the filters because
-             there's a filter that requires two images so the user must choose the filter he wants to apply first
-
-             */
-
-        image_name.clear();
-        cout<<"Pls enter the directory of the image you want to edit (or exit): ";
-        cin>>image_name_before;
-        if(image_name!= "exit" )
+        int choice,choice2;
+        cout<<"1) Gray Scale filer\n2) Black and White filter\n3) Invert Image\n4) Merge two images\n";
+        cout<<"5) Rotate Image\n6) Exit\n";
+        cout<<"PLs choose the filter you want:";
+        cin>>choice;
+        while (choice > 6)
         {
-            Image image(image_name_before);
+            cout<<"Pls enter a valid choice: ";
+            cin>>choice;
+        }
+        if (choice == 6)
+        {
+            cout<<"Thanks for using our program!";
+            exit(0);
+        }
+        cout<<"Pls enter the name of the image you want to edit:";
+        cin>>image_name_before;
+        Image image(image_name_before);
+        if (choice == 1)
+        {
+            cout<<"1) Save image in an existing file\n2) Save the image in new file"<<endl;
+            cout<<"Pls enter your choice:";
+            cin>>choice2;
+            while (choice2 > 2)
+            {
+                cout<<"PLs enter a valid choice: ";
+                cin>>choice2;
+            }
+            if (choice2 == 1)
+            {
+                grayscale(image);
+                if(image.saveImage(image_name_before))
+                    cout<<"The image was loaded successfully"<<endl;
+            }
+            else if (choice2 == 2)
+            {
 
+                cout<<"Enter the new directory or the name of the photo you want ";
+                cout<<"with the format .jpg, .bmp, .png, .tga:";
+                cin >> image_name_after;
+                grayscale(image);
+                if(image.saveImage(image_name_after))
+                {
+                    cout<<"The image was loaded successfully"<<endl;
+                }
 
+            }
+        }
+        else if (choice == 2 )
+        {
+            cout<<"1) Save image in an existing file\n2) Save the image in new file"<<endl;
+            cout<<"Pls enter your choice:";
+            cin>>choice2;
+            while (choice2 > 2)
+            {
+                cout<<"PLs enter a valid choice: ";
+                cin>>choice2;
+            }
+            if (choice2 == 1)
+            {
+                convertToBlackandWhite(image);
+                if(image.saveImage(image_name_before))
+                    cout<<"The image was loaded successfully"<<endl;
+            }
+            else if (choice2 == 2)
+            {
 
-            cout<<"Enter the new directory and name of the photo you want ";
+                cout<<"Enter the new directory or the name of the photo you want ";
+                cout<<"with the format .jpg, .bmp, .png, .tga:";
+                cin >> image_name_after;
+                convertToBlackandWhite(image);
+                if(image.saveImage(image_name_after))
+                {
+                    cout<<"The image was loaded successfully"<<endl;
+                }
+
+            }
+        }
+        else if (choice == 3)
+        {
+            cout<<"1) Save image in an existing file\n2) Save the image in new file"<<endl;
+            cout<<"Pls enter your choice:";
+            cin>>choice2;
+            while (choice2 > 2)
+            {
+                cout<<"PLs enter a valid choice: ";
+                cin>>choice2;
+            }
+            if (choice2 == 1)
+            {
+                invertImage(image);
+                if(image.saveImage(image_name_before))
+                    cout<<"The image was loaded successfully"<<endl;
+            }
+            else if (choice2 == 2)
+            {
+
+                cout<<"Enter the new directory or the name of the photo you want ";
+                cout<<"with the format .jpg, .bmp, .png, .tga:";
+                cin >> image_name_after;
+                invertImage(image);
+                if(image.saveImage(image_name_after))
+                {
+                    cout<<"The image was loaded successfully"<<endl;
+                }
+
+            }
+        }
+        else if (choice == 4)
+        {
+
+            merge_images(image);
+            cout<<"Enter the new directory or the name of the photo you want ";
             cout<<"with the format .jpg, .bmp, .png, .tga:";
-            cin>>image_name;
-            merge_images(image, image_name);
-            // when we activate the filters
-            // we can here make a choice to the user if he wants to save the new photo with the same name and same file or new file with new name
+            cin >> image_name_after;
+            if(image.saveImage(image_name_after))
+            {
+                cout<<"The image was loaded successfully"<<endl;
+            }
 
         }
+        else if (choice == 5)
+        {
+            cout<<"1) Save image in an existing file\n2) Save the image in new file"<<endl;
+            cout<<"Pls enter your choice:";
+            cin>>choice2;
+            while (choice2 > 2)
+            {
+                cout<<"PLs enter a valid choice: ";
+                cin>>choice2;
+            }
+            if (choice2 == 1)
+            {
+                rotateImage(image);
+                if(image.saveImage(image_name_before))
+                    cout<<"The image was loaded successfully"<<endl;
+            }
+            else if (choice2 == 2)
+            {
 
+                cout<<"Enter the new directory or the name of the photo you want ";
+                cout<<"with the format .jpg, .bmp, .png, .tga:";
+                cin >> image_name_after;
+                rotateImage(image);
+                if(image.saveImage(image_name_after))
+                {
+                    cout<<"The image was loaded successfully"<<endl;
+                }
+            }
+        }
     }
-    return 0;
-
 }
