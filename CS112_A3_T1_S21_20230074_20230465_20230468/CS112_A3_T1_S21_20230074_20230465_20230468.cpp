@@ -1,3 +1,18 @@
+/*
+ File: CS112_A3_T1_S21_20230074_20230465_20230468.cpp
+
+Purpose: This is a program that allows the user to load an image, apply filters to it, and save the edited image.
+                 The filters are: rotate, invert, convert to grayscale, darken or lighten, and convert to black and white.
+                The user can choose to load a new image, apply a filter to the current image, save the current image, or exit the program.
+
+ Author: Eyad Tamer Naguib 20230074 - S21 -> Grayscale and Darken/Lighten Functions
+               Yassin Ahmed Ali 20230465 - S21 -> Convert to Black and White Function
+               Yaseen Mohamed Kamal 20230468 - S21  -> Rotate and Invert Functions
+
+ Emails: eyadmohandiss@gmail.com - yassinsawy@outlook.com - yaseen.elolemy@gmail.com
+
+ */
+
 #include <bits/stdc++.h>
 #include "Image_Class.h"
 using namespace std;
@@ -70,7 +85,7 @@ void rotateImage(Image& image)     //By Yaseen El-Olemy: 20230468
 
 }
 
-void invertImage(Image& image)     //By Yaseen El-Olemy: 20230468
+void invertImageColor(Image& image)     //By Yaseen El-Olemy: 20230468
 {
     for(int i =0; i < image.width; ++i)
     {
@@ -83,7 +98,8 @@ void invertImage(Image& image)     //By Yaseen El-Olemy: 20230468
         }
     }
 }
-void grayscale(Image& image)
+
+void grayscale(Image& image) //By Eyad Tamer Naguib: 20230074
 {
     for(int i = 0; i<image.width;i++)
     {
@@ -106,59 +122,49 @@ void grayscale(Image& image)
         }
     }
 }
-void merge_images (Image& image1)
+
+void darken_and_lighten(Image& image) //By Eyad Tamer Naguib: 20230074
 {
-    // Prompt the user for the name of the second image
-    string image2Name;
-    cout << "Please enter the directory of the second image: ";
-    cin >> image2Name;
-
-    // Load the second image
-    Image image2(image2Name);
-
-    // Determine the dimensions of the new image
-    int newWidth = max(image1.width, image2.width);
-    int newHeight = max(image1.height, image2.height);
-
-    // Create the new image with the larger dimensions
-    Image newImage(newWidth, newHeight);
-
-    // Scale and copy the pixel data from the first image into the new image
-    for (int i = 0; i < newWidth; ++i)
+    string choice;
+    cout << "Do you want to darken or lighten the image? (darken/lighten): ";
+    cin >> choice;
+    // Convert the input to lowercase
+    transform(choice.begin(), choice.end(), choice.begin(), ::tolower);
+// Loop until a valid input is given
+    while (choice != "darken" && choice != "lighten")
     {
-        for (int j = 0; j < newHeight; ++j)
-        {
-            for (int k = 0; k < image1.channels; ++k)
-            {
-                // Calculate the corresponding coordinates in the original image
-                int oldX = i * image1.width / newWidth;
-                int oldY = j * image1.height / newHeight;
+        cout << "Invalid option. Please try again." << endl;
+        cin >> choice;
+        // Convert the input to lowercase
+        transform(choice.begin(), choice.end(), choice.begin(), ::tolower);
+    }
 
-                // Copy the pixel data
-                newImage(i, j, k) = image1(oldX, oldY, k);
+    bool darken = (choice == "darken");
+
+    for(int i = 0; i<image.width;i++)
+    {
+        for(int j = 0; j<image.height;j++)
+        {
+            for(int k = 0;k<3;k++)
+            {
+                // Get the current color value
+                unsigned int color = image(i,j,k);
+                if(darken)
+                {
+                    // Reduce the color value by 50% to darken the image
+                    image.setPixel(i,j,k,color/2);
+                }
+                else
+                {
+                    // Increase the color value by 50% to lighten the image, but not exceeding 255
+                    image.setPixel(i,j,k,min(color + color/2, (unsigned int)255));
+                }
             }
         }
     }
-
-    // Scale and copy the pixel data from the second image into the new image
-    for (int i = 0; i < newWidth; ++i)
-    {
-        for (int j = 0; j < newHeight; ++j)
-        {
-            for (int k = 0; k < image2.channels; ++k)
-            {
-                // Calculate the corresponding coordinates in the original image
-                int oldX = i * image2.width / newWidth;
-                int oldY = j * image2.height / newHeight;
-
-                // Average the pixel values of the two images
-                newImage(i, j, k) = (newImage(i, j, k) + image2(oldX, oldY, k)) / 2;
-            }
-        }
-    }
-
 }
-void convertToBlackandWhite(Image& image)
+
+void convertToBlackandWhite(Image& image) //By Yassin Ahmed Ali: 20230465
 {
     for(int i = 0; i<image.width;i++)
     {
@@ -196,158 +202,182 @@ void convertToBlackandWhite(Image& image)
 
 int main()
 {
-    string image_name_before, image_name_after;
-    cout<<"Welcome to Editing Photo Program"<<endl;
-    while(true)
+    string image_name;
+    // Initialize image pointer to null
+    Image* image = nullptr;
+
+    cout << "Welcome to Editing Photo Program" << endl;
+// Loop forever until user exits
+    while (true)
     {
-        int choice,choice2;
-        cout<<"1) Gray Scale filer\n2) Black and White filter\n3) Invert Image\n4) Merge two images\n";
-        cout<<"5) Rotate Image\n6) Exit\n";
-        cout<<"PLs choose the filter you want:";
-        cin>>choice;
-        while (choice > 6)
-        {
-            cout<<"Pls enter a valid choice: ";
-            cin>>choice;
-        }
-        if (choice == 6)
-        {
-            cout<<"Thanks for using our program!";
-            exit(0);
-        }
-        cout<<"Pls enter the name of the image you want to edit:";
-        cin>>image_name_before;
-        Image image(image_name_before);
-        if (choice == 1)
-        {
-            cout<<"1) Save image in an existing file\n2) Save the image in new file"<<endl;
-            cout<<"Pls enter your choice:";
-            cin>>choice2;
-            while (choice2 > 2)
-            {
-                cout<<"PLs enter a valid choice: ";
-                cin>>choice2;
-            }
-            if (choice2 == 1)
-            {
-                grayscale(image);
-                if(image.saveImage(image_name_before))
-                    cout<<"The image was loaded successfully"<<endl;
-            }
-            else if (choice2 == 2)
-            {
+        cout<<"What would you like to do?"<<endl;
+        cout << "1. Load a new image" << endl;
+        cout << "2. Apply a filter to the current image" << endl;
+        cout << "3. Save the current image" << endl;
+        cout << "4. Exit" << endl;
+        cout << "Please choose an option:" << endl;
 
-                cout<<"Enter the new directory or the name of the photo you want ";
-                cout<<"with the format .jpg, .bmp, .png, .tga:";
-                cin >> image_name_after;
-                grayscale(image);
-                if(image.saveImage(image_name_after))
+        int option;
+        // Loop until a valid input is given
+        while (!(cin >> option) || (option < 1 || option > 4))
+        {
+            cout << "Invalid option. Please try again." << endl;
+            // Clear the error flags
+            cin.clear();
+            // Ignore the rest of the line
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+
+        switch (option)
+        {
+            // Load a new image
+            case 1:
+            {
+                // If there is a current image
+                if (image != nullptr)
                 {
-                    cout<<"The image was loaded successfully"<<endl;
+                    cout << "Do you want to save the current image before loading a new one? (yes/no): ";
+                    string saveCurrent;
+                    cin >> saveCurrent;
+                    // Convert the input to lowercase
+                    transform(saveCurrent.begin(), saveCurrent.end(), saveCurrent.begin(), ::tolower);
+                    // Loop until a valid input is given
+                    while (saveCurrent != "yes" && saveCurrent != "no")
+                    {
+                        cout << "Invalid option. Please try again." << endl;
+                        cin >> saveCurrent;
+                        // Convert the input to lowercase
+                        transform(saveCurrent.begin(), saveCurrent.end(), saveCurrent.begin(), ::tolower);
+                    }
+
+                    if (saveCurrent == "yes")
+                    {
+                        cout << "Enter the directory and name of the photo you want to save with the format .jpg, .bmp, .png, .tga: ";
+                        cin >> image_name;
+                        image->saveImage(image_name);
+                    }
+                }
+                cout << "Please enter the directory or the name of the image you want to edit\n";
+                cout<<"with the format .jpg, .bmp, .png, .tga:"<<endl;
+                cin >> image_name;
+                // Delete the old image if it exists
+                delete image;
+                // Load the new image
+                image = new Image(image_name);
+                break;
+            }
+                // Apply a filter
+            case 2:
+            {
+                if (image == nullptr)
+                {
+                    cout << "No image loaded. Please load an image first." << endl;
+                    break;
+                }
+                cout << "Please choose a filter to apply:" << endl;
+                cout << "1. Rotate the image" << endl;
+                cout << "2. Darken or lighten the image" << endl;
+                cout << "3. Convert the image to black and white" << endl;
+                cout << "4. Invert the color of the image" << endl;
+                cout << "5. Convert the image to grayscale" << endl;
+
+                int filterOption;
+                // Loop until a valid input is given
+                while (!(cin >> filterOption) || (filterOption < 1 || filterOption > 5))
+                {
+                    cout << "Invalid option. Please try again." << endl;
+                    // Clear the error flags
+                    cin.clear();
+                    // Ignore the rest of the line
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
                 }
 
-            }
-        }
-        else if (choice == 2 )
-        {
-            cout<<"1) Save image in an existing file\n2) Save the image in new file"<<endl;
-            cout<<"Pls enter your choice:";
-            cin>>choice2;
-            while (choice2 > 2)
-            {
-                cout<<"PLs enter a valid choice: ";
-                cin>>choice2;
-            }
-            if (choice2 == 1)
-            {
-                convertToBlackandWhite(image);
-                if(image.saveImage(image_name_before))
-                    cout<<"The image was loaded successfully"<<endl;
-            }
-            else if (choice2 == 2)
-            {
-
-                cout<<"Enter the new directory or the name of the photo you want ";
-                cout<<"with the format .jpg, .bmp, .png, .tga:";
-                cin >> image_name_after;
-                convertToBlackandWhite(image);
-                if(image.saveImage(image_name_after))
+                switch (filterOption)
                 {
-                    cout<<"The image was loaded successfully"<<endl;
+                    case 1:
+                        rotateImage(*image);
+                        break;
+                    case 2:
+                        darken_and_lighten(*image);
+                        break;
+                    case 3:
+                        convertToBlackandWhite(*image);
+                        break;
+                    case 4:
+                        invertImageColor(*image);
+                        break;
+                    case 5:
+                        grayscale(*image);
+                        break;
+                }
+                cout<<"Filter applied successfully!"<<endl;
+                break;
+            }
+                // Save the image
+            case 3:
+            {
+                if (image == nullptr)
+                {
+                    cout << "No image to save. Please load an image first." << endl;
+                    break;
+                }
+                cout << "Do you want to save the image in the same file or in a new file? (same/new): ";
+                string saveOption;
+                cin >> saveOption;
+                // Convert the input to lowercase
+                transform(saveOption.begin(), saveOption.end(), saveOption.begin(), ::tolower);
+                // Loop until a valid input is given
+                while (saveOption != "same" && saveOption != "new")
+                {
+                    cout << "Invalid option. Please try again." << endl;
+                    cin >> saveOption;
+                    // Convert the input to lowercase
+                    transform(saveOption.begin(), saveOption.end(), saveOption.begin(), ::tolower);
                 }
 
-            }
-        }
-        else if (choice == 3)
-        {
-            cout<<"1) Save image in an existing file\n2) Save the image in new file"<<endl;
-            cout<<"Pls enter your choice:";
-            cin>>choice2;
-            while (choice2 > 2)
-            {
-                cout<<"PLs enter a valid choice: ";
-                cin>>choice2;
-            }
-            if (choice2 == 1)
-            {
-                invertImage(image);
-                if(image.saveImage(image_name_before))
-                    cout<<"The image was loaded successfully"<<endl;
-            }
-            else if (choice2 == 2)
-            {
-
-                cout<<"Enter the new directory or the name of the photo you want ";
-                cout<<"with the format .jpg, .bmp, .png, .tga:";
-                cin >> image_name_after;
-                invertImage(image);
-                if(image.saveImage(image_name_after))
+                if (saveOption == "same")
                 {
-                    cout<<"The image was loaded successfully"<<endl;
+                    image->saveImage(image_name);
                 }
-
-            }
-        }
-        else if (choice == 4)
-        {
-
-            merge_images(image);
-            cout<<"Enter the new directory or the name of the photo you want ";
-            cout<<"with the format .jpg, .bmp, .png, .tga:";
-            cin >> image_name_after;
-            if(image.saveImage(image_name_after))
-            {
-                cout<<"The image was loaded successfully"<<endl;
-            }
-
-        }
-        else if (choice == 5)
-        {
-            cout<<"1) Save image in an existing file\n2) Save the image in new file"<<endl;
-            cout<<"Pls enter your choice:";
-            cin>>choice2;
-            while (choice2 > 2)
-            {
-                cout<<"PLs enter a valid choice: ";
-                cin>>choice2;
-            }
-            if (choice2 == 1)
-            {
-                rotateImage(image);
-                if(image.saveImage(image_name_before))
-                    cout<<"The image was loaded successfully"<<endl;
-            }
-            else if (choice2 == 2)
-            {
-
-                cout<<"Enter the new directory or the name of the photo you want ";
-                cout<<"with the format .jpg, .bmp, .png, .tga:";
-                cin >> image_name_after;
-                rotateImage(image);
-                if(image.saveImage(image_name_after))
+                else if (saveOption == "new")
                 {
-                    cout<<"The image was loaded successfully"<<endl;
+                    cout << "Enter the directory and name of the photo you want to save with the format .jpg, .bmp, .png, .tga: ";
+                    cin >> image_name;
+                    image->saveImage(image_name);
                 }
+                break;
+            }
+                // Exit the program
+            case 4:
+            {
+                // If there is a current image
+                if (image != nullptr)
+                {
+                    cout << "Do you want to save the current image before exiting? (yes/no): ";
+                    string saveCurrent;
+                    cin >> saveCurrent;
+                    // Convert the input to lowercase
+                    transform(saveCurrent.begin(), saveCurrent.end(), saveCurrent.begin(), ::tolower);
+                    // Loop until a valid input is given
+                    while (saveCurrent != "yes" && saveCurrent != "no")
+                    {
+                        cout << "Invalid option. Please try again." << endl;
+                        cin >> saveCurrent;
+                        // Convert the input to lowercase
+                        transform(saveCurrent.begin(), saveCurrent.end(), saveCurrent.begin(), ::tolower);
+                    }
+
+                    if (saveCurrent == "yes")
+                    {
+                        cout << "Enter the directory and name of the photo you want to save with the format .jpg, .bmp, .png, .tga: ";
+                        cin >> image_name;
+                        image->saveImage(image_name);
+                    }
+                }
+                // Delete the image before exiting
+                delete image;
+                cout<<"Thank you for using our program!"<<endl;
+                return 0;
             }
         }
     }
