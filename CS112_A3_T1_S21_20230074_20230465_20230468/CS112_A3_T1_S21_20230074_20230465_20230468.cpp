@@ -17,72 +17,49 @@ Purpose: This is a program that allows the user to load an image, apply filters 
 #include "Image_Class.h"
 using namespace std;
 
-void rotateImage(Image& image)     //By Yaseen El-Olemy: 20230468
-{
-    int toRotate;       //placeholder to specify
-    cout<<"to rotate 90 Degrees Clockwise[1]\nto rotate 180 Degrees[2]\nto rotate 270 Degrees Clockwise[3]\n-> ";
-    cin>>toRotate;
+void flipImage(Image& image) {
+    int flipOption;
+    cout << "Please choose a flip option:" << endl;
+    cout << "1. Flip the image horizontally" << endl;
+    cout << "2. Flip the image vertically" << endl;
 
-    if(toRotate == 1)
-    {
-
-        Image ninetied(image.height, image.width);
-        for(int i = image.width -1 ; i>=0; --i)
-        {
-            for(int j = image.height -1; j>=0; --j)
-            {
-                for(int k = 0; k < image.channels; ++k)
-                {
-                    ninetied(j , i ,k) = image(i, j, k);
-                }
-            }
-        }
-        Image inverted(ninetied.width, ninetied.height);
-        for(int i = 0; i < ninetied.width; ++i)
-        {
-            for(int j = 0; j < ninetied.height; ++j)
-            {
-                for(int k = 0; k < ninetied.channels; ++k)
-                {
-                    inverted(i, j, k) = ninetied((ninetied.width -1) - i,(ninetied.height-1) - j,k);
-                }
-            }
-        }
-
+    // Loop until a valid input is given
+    while (!(cin >> flipOption) || (flipOption < 1 || flipOption > 2)) {
+        cout << "Invalid option. Please try again." << endl;
+        // Clear the error flags
+        cin.clear();
+        // Ignore the rest of the line
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
     }
 
-    if(toRotate == 2)
-    {
-        Image inverted(image.width, image.height);
-        for(int i = 0; i < image.width; ++i)
-        {
-            for(int j = 0; j < image.height; ++j)
-            {
-                for(int k = 0; k < image.channels; ++k)
-                {
-                    inverted(i, j, k) = image((image.width -1) - i,(image.height-1) - j,k);
+    switch (flipOption) {
+        // Flip horizontally
+        case 1:
+            for (int i = 0; i < image.width / 2; ++i) {
+                for (int j = 0; j < image.height; ++j) {
+                    for (int k = 0; k < image.channels; ++k) {
+                        // Swap pixels horizontally
+                        int temp = image.getPixel(i, j, k);
+                        image.setPixel(i, j, k, image.getPixel(image.width - i - 1, j, k));
+                        image.setPixel(image.width - i - 1, j, k, temp);
+                    }
                 }
             }
-        }
-
-    }
-
-    if(toRotate == 3)
-    {
-        Image ninetied(image.height, image.width);
-        for(int i = image.width -1 ; i>=0; --i)
-        {
-            for(int j = image.height -1; j>=0; --j)
-            {
-                for(int k = 0; k < image.channels; ++k)
-                {
-                    ninetied(j , i ,k) = image(i, j, k);
+            break;
+            // Flip vertically
+        case 2:
+            for (int i = 0; i < image.width; ++i) {
+                for (int j = 0; j < image.height / 2; ++j) {
+                    for (int k = 0; k < image.channels; ++k) {
+                        // Swap pixels vertically
+                        int temp = image.getPixel(i, j, k);
+                        image.setPixel(i, j, k, image.getPixel(i, image.height - j - 1, k));
+                        image.setPixel(i, image.height - j - 1, k, temp);
+                    }
                 }
             }
-        }
-
+            break;
     }
-
 }
 
 void invertImageColor(Image& image)     //By Yaseen El-Olemy: 20230468
@@ -98,6 +75,7 @@ void invertImageColor(Image& image)     //By Yaseen El-Olemy: 20230468
         }
     }
 }
+
 
 void grayscale(Image& image) //By Eyad Tamer Naguib: 20230074
 {
@@ -275,7 +253,7 @@ int main()
                     break;
                 }
                 cout << "Please choose a filter to apply:" << endl;
-                cout << "1. Rotate the image" << endl;
+                cout << "1. Flip the image" << endl;
                 cout << "2. Darken or lighten the image" << endl;
                 cout << "3. Convert the image to black and white" << endl;
                 cout << "4. Invert the color of the image" << endl;
@@ -295,7 +273,7 @@ int main()
                 switch (filterOption)
                 {
                     case 1:
-                        rotateImage(*image);
+                        flipImage(*image);
                         break;
                     case 2:
                         darken_and_lighten(*image);
