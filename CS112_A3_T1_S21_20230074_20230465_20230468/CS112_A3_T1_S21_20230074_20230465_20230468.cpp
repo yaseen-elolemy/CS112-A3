@@ -6,8 +6,8 @@ Purpose: This is a program that allows the user to load an image, apply filters 
                 The user can choose to load a new image, apply a filter to the current image, save the current image, or exit the program.
 
  Author:    Eyad Tamer Naguib 20230074 - S21 -> Grayscale and Darken/Lighten Functions
-            Yassin Ahmed Ali 20230465 - S21 -> Convert to Black and White Function
-            Yaseen Mohamed Kamal 20230468 - S21  -> Rotate and Invert Functions
+            Yassin Ahmed Ali 20230465 - S21 -> Flipping the image and Convert to Black and White Function
+            Yaseen Mohamed Kamal 20230468 - S21  ->  Invert the color Functions
 
  Emails: eyadmohandiss@gmail.com - yassinsawy@outlook.com - yaseen.elolemy@gmail.com
 
@@ -17,75 +17,46 @@ Purpose: This is a program that allows the user to load an image, apply filters 
 #include "Image_Class.h"
 using namespace std;
 
-void rotateImage(Image& image)     //By Yaseen El-Olemy: 20230468
-{
-    int toRotate;       //placeholder to specify
-    cout<<"to rotate 90 Degrees Clockwise[1]\nto rotate 180 Degrees[2]\nto rotate 270 Degrees Clockwise[3]\n-> ";
-    cin>>toRotate;
-    string newname;
-    cout<<"Enter name to save file in (or same to save in same file) with the format .jpg, .bmp, .png, .tga: ";
-    cin>>newname;
+void flipImage(Image& image) {  //By Yassin Ahmed Ali: 20230465
+    int flipOption;
+    cout << "Please choose a flip option:" << endl;
+    cout << "1. Flip the image horizontally" << endl;
+    cout << "2. Flip the image vertically" << endl;
 
-    if(toRotate == 1)
-    {
-
-        Image ninetied(image.height, image.width);
-        for(int i = image.width -1 ; i>=0; --i)
-        {
-            for(int j = image.height -1; j>=0; --j)
-            {
-                for(int k = 0; k < image.channels; ++k)
-                {
-                    ninetied(j , i ,k) = image(i, j, k);
-                }
-            }
-        }
-        Image inverted(ninetied.width, ninetied.height);
-        for(int i = 0; i < ninetied.width; ++i)
-        {
-            for(int j = 0; j < ninetied.height; ++j)
-            {
-                for(int k = 0; k < ninetied.channels; ++k)
-                {
-                    inverted(i, j, k) = ninetied((ninetied.width -1) - i,(ninetied.height-1) - j,k);
-                }
-            }
-        }
-        inverted.saveImage(newname);
-
+    // Loop until a valid input is given
+    while (!(cin >> flipOption) || (flipOption < 1 || flipOption > 2)) {
+        cout << "Invalid option. Please try again." << endl;
+        // Clear the error flags
+        cin.clear();
+        // Ignore the rest of the line
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
     }
 
-    if(toRotate == 2)
-    {
-        Image inverted(image.width, image.height);
-        for(int i = 0; i < image.width; ++i)
-        {
-            for(int j = 0; j < image.height; ++j)
-            {
-                for(int k = 0; k < image.channels; ++k)
-                {
-                    inverted(i, j, k) = image((image.width -1) - i,(image.height-1) - j,k);
+    switch (flipOption) {
+        case 1: // Flip horizontally
+            for (int i = 0; i < image.width / 2; ++i) {
+                for (int j = 0; j < image.height; ++j) {
+                    for (int k = 0; k < image.channels; ++k) {
+                        // Swap pixels horizontally
+                        int temp = image.getPixel(i, j, k);
+                        image.setPixel(i, j, k, image.getPixel(image.width - i - 1, j, k));
+                        image.setPixel(image.width - i - 1, j, k, temp);
+                    }
                 }
             }
-        }
-        inverted.saveImage(newname);
-
-    }
-
-    if(toRotate == 3)
-    {
-        Image inverted(image.height, image.width);
-        for(int i = image.width -1 ; i>=0; --i)
-        {
-            for(int j = image.height -1; j>=0; --j)
-            {
-                for(int k = 0; k < image.channels; ++k)
-                {
-                    inverted(j , i ,k) = image(i, j, k);
+            break;
+        case 2: // Flip vertically
+            for (int i = 0; i < image.width; ++i) {
+                for (int j = 0; j < image.height / 2; ++j) {
+                    for (int k = 0; k < image.channels; ++k) {
+                        // Swap pixels vertically
+                        int temp = image.getPixel(i, j, k);
+                        image.setPixel(i, j, k, image.getPixel(i, image.height - j - 1, k));
+                        image.setPixel(i, image.height - j - 1, k, temp);
+                    }
                 }
             }
-        }
-        inverted.saveImage(newname);
+            break;
     }
 }
 
@@ -299,8 +270,7 @@ int main()
                 switch (filterOption)
                 {
                     case 1:
-                        rotateImage(*image);
-                        goto last;
+                        flipImage(*image);
                         break;
                     case 2:
                         darken_and_lighten(*image);
