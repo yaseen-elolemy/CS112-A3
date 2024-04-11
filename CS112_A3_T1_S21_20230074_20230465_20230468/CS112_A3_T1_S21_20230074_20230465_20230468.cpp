@@ -226,6 +226,22 @@ void resize(Image &image, int newWidth, int newHeight)  // By Yassin Ahmed Ali: 
 
 }
 
+// From the Bonus Filters
+void infrared (Image& image)  // By Yassin Ahmed Ali: 20230465
+{
+    for(int i = 0; i<image.width;i++)
+    {
+        for(int j = 0; j<image.height;j++)
+        {
+            for(int k = 0;k<3;k++)
+            {
+                // changing the colors of the image to their opposite colors
+                image.setPixel(i,j,k,255-image(i,j,k));
+            }
+        }
+    }
+}
+
 
 int main()
 {
