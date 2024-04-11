@@ -472,7 +472,10 @@ int main()
                 cout << "6. Detect edges in the image" << endl;
                 cout << "7. Merge the image with another image" << endl;
                 cout << "8. Apply a purple filter to the image" << endl;
-
+                cout<< "9. Crop Image" <<endl;
+                cout<< "10. Resize Image" << endl;
+                cout<<"11. Apply Infrared Filter" << endl;
+                // the rest of the filters
                 int filterOption;
                 // Loop until a valid input is given
                 while (!(cin >> filterOption) || (filterOption < 1 || filterOption > 8))
