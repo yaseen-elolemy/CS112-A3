@@ -307,8 +307,17 @@ void convertToBlackandWhite(Image& image) //By Yassin Ahmed Ali: 20230465
     }
 }
 
-void crop(Image &image, int x, int y, int width, int height)   // By Yassin Ahmed Ali: 20230465
+void crop(Image &image)   // By Yassin Ahmed Ali: 20230465
 {
+    int x, y,width,height;
+    cout << "Enter the x-coordinate of the top-left corner of the crop area: ";
+    cin >> x;
+    cout << "Enter the y-coordinate of the top-left corner of the crop area: ";
+    cin >> y;
+    cout << "Enter the width of the crop area: ";
+    cin >> width;
+    cout << "Enter the height of the crop area: ";
+    cin >> height;
     // Check if the crop dimensions are valid
     if (x < 0 || y < 0 || width <= 0 || height <= 0 || x + width > image.width || y + height > image.height) {
         cout << "Invalid crop dimensions." << endl;
@@ -326,8 +335,58 @@ void crop(Image &image, int x, int y, int width, int height)   // By Yassin Ahme
             }
         }
     }
+    image = newImage;
+}
+void resize(Image &image)
+{
+
+    int newWidth, newHeight;
+    cout << "Enter the new width: ";
+    cin >> newWidth;
+    cout << "Enter the new height: ";
+    cin >> newHeight;
+    // Check if the new dimensions are valid
+    if (newWidth <= 0 || newHeight <= 0) {
+        cout << "Invalid image dimensions." << endl;
+        return;
+    }
+
+    // Create a new Image object with the specified width and height
+    Image newImage(newWidth, newHeight);
+
+    // Calculate the scaling factors for the width and height
+    double scaleX = static_cast<double>(image.width) / newWidth;
+    double scaleY = static_cast<double>(image.height) / newHeight;
+
+    // Loop over each pixel in the new image
+    for (int i = 0; i < newWidth; ++i) {
+        for (int j = 0; j < newHeight; ++j) {
+            // Calculate the corresponding pixel coordinates in the original image
+            int x = static_cast<int>(i * scaleX);
+            int y = static_cast<int>(j * scaleY);
+
+            // Copy the pixel data from the original image to the new image
+            for (int k = 0; k < image.channels; ++k) {
+                newImage.setPixel(i, j, k, image.getPixel(x, y, k));
+            }
+        }
+    }
+    image = newImage;
 
 }
+
+
+void InfraredFilter(Image& image) { //By Yassin Ahmed Ali: 20230465
+
+    for (int i = 0; i < image.width; i++) {
+        for (int j = 0; j < image.height; j++) {
+            image(i, j, 0) = min(image(i, j, 0) + 200, 255);
+            image(i, j, 1) = min(image(i, j, 1) + 50, 255);
+            image(i, j, 2) = min(image(i, j, 2) + 50, 255);
+        }
+    }
+}
+
 
 
 int main()
@@ -450,6 +509,15 @@ int main()
                         break;
                     case 8:
                         purpleFilter(*image);
+                        break;
+                     case 9:
+                        crop(*image);
+                        break;
+                    case 10:
+                        resize(*image);
+                        break;
+                    case 11:
+                        InfraredFilter(*image);
                         break;
 
                 }
