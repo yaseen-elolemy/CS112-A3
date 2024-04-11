@@ -173,6 +173,58 @@ void convertToBlackandWhite(Image& image) //By Yassin Ahmed Ali: 20230465
     }
 }
 
+void crop(Image &image, int x, int y, int width, int height)   // By Yassin Ahmed Ali: 20230465
+{
+    // Check if the crop dimensions are valid
+    if (x < 0 || y < 0 || width <= 0 || height <= 0 || x + width > image.width || y + height > image.height) {
+        cout << "Invalid crop dimensions." << endl;
+        return;
+    }
+
+    // Create a new Image object with the specified width and height
+    Image newImage(width, height);
+
+    // Copy the pixel data from the original image to the new image
+    for (int i = 0; i < width; ++i) {
+        for (int j = 0; j < height; ++j) {
+            for (int k = 0; k < image.channels; ++k) {
+                newImage.setPixel(i, j, k, image.getPixel(x + i, y + j, k));
+            }
+        }
+    }
+
+}
+
+void resize(Image &image, int newWidth, int newHeight)  // By Yassin Ahmed Ali: 20230465
+{
+    // Check if the new dimensions are valid
+    if (newWidth <= 0 || newHeight <= 0) {
+        cout << "Invalid image dimensions." << endl;
+        return;
+    }
+
+    // Create a new Image object with the specified width and height
+    Image newImage(newWidth, newHeight);
+
+    // Calculate the scaling factors for the width and height
+    double scaleX = static_cast<double>(image.width) / newWidth;
+    double scaleY = static_cast<double>(image.height) / newHeight;
+
+    // Loop over each pixel in the new image
+    for (int i = 0; i < newWidth; ++i) {
+        for (int j = 0; j < newHeight; ++j) {
+            // Calculate the corresponding pixel coordinates in the original image
+            int x = static_cast<int>(i * scaleX);
+            int y = static_cast<int>(j * scaleY);
+
+            // Copy the pixel data from the original image to the new image
+            for (int k = 0; k < image.channels; ++k) {
+                newImage.setPixel(i, j, k, image.getPixel(x, y, k));
+            }
+        }
+    }
+
+}
 
 
 int main()
