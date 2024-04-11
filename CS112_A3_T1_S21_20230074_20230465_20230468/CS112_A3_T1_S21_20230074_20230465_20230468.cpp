@@ -337,7 +337,7 @@ void crop(Image &image)   // By Yassin Ahmed Ali: 20230465
     }
     image = newImage;
 }
-void resize(Image &image)
+void resize(Image &image) //By Yassin Ahmed Ali: 20230465
 {
 
     int newWidth, newHeight;
