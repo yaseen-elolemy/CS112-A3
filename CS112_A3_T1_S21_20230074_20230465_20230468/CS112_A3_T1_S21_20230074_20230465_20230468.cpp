@@ -194,6 +194,39 @@ void rotateImage(Image& image)     //By Yaseen El-Olemy: 20230468
     }
 }
 
+void addFrame(Image &image)
+{
+   int bordersize = image.width * 0.1;
+   Image newimage(image.width + bordersize, image.height + bordersize);
+   int color=0;
+   while(color<1 || color > 2)
+    {
+   cout<<"Enter color of frame[1.red/2.green/3.blue]: ";
+   cin>>color;
+   if(color<1 || color > 3)
+   {
+       cout<<"ERROR: invalid input"<<endl;
+   }
+    }
+   --color;
+   for(int i =0; i<image.width + bordersize; ++i)
+   {
+       for(int j = 0; j<image.height + bordersize; ++j)
+       {
+                if(i <= bordersize / 2 || j <= bordersize / 2 || i >= image.width + (bordersize / 2) || j >= image.width + (bordersize / 2))
+                {
+                    newimage(i,j,color) = 255;
+                }
+                else
+                {
+                    for(int k = 0; k < image.channels; ++k)
+                        newimage(i,j,k) = image(i - (bordersize / 2) - 1, j - (bordersize / 2) - 1, k);
+                }
+
+       }
+   }
+   image = newimage;
+}
 
 void detect_edges(Image& image) //By Eyad Tamer Naguib: 20230074
 {
@@ -545,10 +578,12 @@ int main()
                 cout<< "9. Crop Image" <<endl;
                 cout<< "10. Resize Image" << endl;
                 cout<<"11. Apply Infrared Filter" << endl;
+                cout<<"12. Rotate image"<<endl;
+                cout<<"13. Add frame"<<endl;
                 // the rest of the filters
                 int filterOption;
                 // Loop until a valid input is given
-                while (!(cin >> filterOption) || (filterOption < 1 || filterOption > 8))
+                while (!(cin >> filterOption) || (filterOption < 1 || filterOption > 13))
                 {
                     cout << "Invalid option. Please try again." << endl;
                     // Clear the error flags
@@ -583,7 +618,7 @@ int main()
                     case 8:
                         purpleFilter(*image);
                         break;
-                     case 9:
+                    case 9:
                         crop(*image);
                         break;
                     case 10:
@@ -591,6 +626,12 @@ int main()
                         break;
                     case 11:
                         InfraredFilter(*image);
+                        break;
+                    case 12:
+                        rotateImage(*image);
+                        break;
+                    case 13:
+                        addFrame(*image);
                         break;
 
                 }
@@ -688,7 +729,7 @@ int main()
                 }
                 last:
                 // Delete the image before exiting
-                delete image;
+                //delete image;     btedy ma3 olemy error
                 cout<<"Thank you for using our program!"<<endl;
                 return 0;
             }
