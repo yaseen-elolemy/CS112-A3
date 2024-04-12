@@ -7,7 +7,7 @@ Purpose: This is a program that allows the user to load an image, apply filters 
 
  Author:    Eyad Tamer Naguib 20230074 - S21 -> Grayscale - Darken/Lighten - Detect Edges - purple filter - Merge Images Functions
             Yassin Ahmed Ali 20230465 - S21 -> Flipping the image and Convert to Black and White Function
-            Yaseen Mohamed Kamal 20230468 - S21  ->  Invert the color Functions
+            Yaseen Mohamed Kamal 20230468 - S21  ->  Invert the color - blur - add frame - rotate image
 
  Emails: eyadmohandiss@gmail.com - yassinsawy@outlook.com - yaseen.elolemy@gmail.com
 
@@ -45,6 +45,34 @@ Image resize_image_for_merge(Image &image, int newWidth, int newHeight)
 
 }
 
+void blurImage(Image& image)    //By: Yaseen El-Olemy(20230468)
+{
+    int avg = 0;
+    Image blurred(image.width, image.height);
+    for(int i = 3; i < image.width - 2; ++i)
+    {
+        for(int j = 3; j < image.height - 2; ++j)
+        {
+            for(int k = 0; k < image.channels; k++)
+            {
+                avg = 0;
+                avg += image(i-1,j-1,k);
+                avg += image(i-1,j,k);
+                avg += image(i-1,j+1,k);
+                avg += image(i,j-1,k);
+                avg += image(i,j,k);
+                avg += image(i,j+1,k);
+                avg += image(i+1,j-1,k);
+                avg += image(i+1,j,k);
+                avg += image(i+1,j+1,k);
+
+                avg = avg/9;
+                blurred(i,j,k)= avg;
+            }
+        }
+    }
+    image = blurred;
+}
 
 void mergeImages(Image& image1) {
     string image2_name;
@@ -124,7 +152,7 @@ void purpleFilter(Image &image) {   //By Eyad Tamer Naguib: 20230074
     }
 }
 
-void rotateImage(Image& image)     //By Yaseen El-Olemy: 20230468
+void rotateImage(Image& image)     //By: Yaseen El-Olemy(20230468)
 {
     int toRotate;       //placeholder to specify
     cout<<"to rotate 90 Degrees Clockwise[1]\nto rotate 180 Degrees[2]\nto rotate 270 Degrees Clockwise[3]\n-> ";
@@ -194,12 +222,12 @@ void rotateImage(Image& image)     //By Yaseen El-Olemy: 20230468
     }
 }
 
-void addFrame(Image &image)
+void addFrame(Image &image)     //By: Yaseen El-Olemy(20230468)
 {
    int bordersize = image.width * 0.1;
    Image newimage(image.width + bordersize, image.height + bordersize);
    int color=0;
-   while(color<1 || color > 2)
+   while(color<1 || color >3)
     {
    cout<<"Enter color of frame[1.red/2.green/3.blue]: ";
    cin>>color;
@@ -297,7 +325,7 @@ void flipImage(Image& image) {  //By Yassin Ahmed Ali: 20230465
     }
 }
 
-void invertImageColor(Image& image)     //By Yaseen El-Olemy: 20230468
+void invertImageColor(Image& image)     //By: Yaseen El-Olemy(20230468)
 {
     for(int i =0; i < image.width; ++i)
     {
@@ -580,10 +608,11 @@ int main()
                 cout<<"11. Apply Infrared Filter" << endl;
                 cout<<"12. Rotate image"<<endl;
                 cout<<"13. Add frame"<<endl;
+                cout<<"14. Blur image"<<endl;
                 // the rest of the filters
                 int filterOption;
                 // Loop until a valid input is given
-                while (!(cin >> filterOption) || (filterOption < 1 || filterOption > 13))
+                while (!(cin >> filterOption) || (filterOption < 1 || filterOption > 14))
                 {
                     cout << "Invalid option. Please try again." << endl;
                     // Clear the error flags
@@ -632,6 +661,9 @@ int main()
                         break;
                     case 13:
                         addFrame(*image);
+                        break;
+                    case 14:
+                        blurImage(*image);
                         break;
 
                 }
