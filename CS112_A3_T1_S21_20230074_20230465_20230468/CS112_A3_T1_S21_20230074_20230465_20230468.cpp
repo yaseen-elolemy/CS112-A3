@@ -124,6 +124,76 @@ void purpleFilter(Image &image) {   //By Eyad Tamer Naguib: 20230074
     }
 }
 
+void rotateImage(Image& image)     //By Yaseen El-Olemy: 20230468
+{
+    int toRotate;       //placeholder to specify
+    cout<<"to rotate 90 Degrees Clockwise[1]\nto rotate 180 Degrees[2]\nto rotate 270 Degrees Clockwise[3]\n-> ";
+    cin>>toRotate;
+    string newname;
+    cout<<"Enter name to save file in (or same to save in same file) with the format .jpg, .bmp, .png, .tga: ";
+    cin>>newname;
+
+    if(toRotate == 1)
+    {
+
+        Image ninetied(image.height, image.width);
+        for(int i = image.width -1 ; i>=0; --i)
+        {
+            for(int j = image.height -1; j>=0; --j)
+            {
+                for(int k = 0; k < image.channels; ++k)
+                {
+                    ninetied(j , i ,k) = image(i, j, k);
+                }
+            }
+        }
+        Image inverted(ninetied.width, ninetied.height);
+        for(int i = 0; i < ninetied.width; ++i)
+        {
+            for(int j = 0; j < ninetied.height; ++j)
+            {
+                for(int k = 0; k < ninetied.channels; ++k)
+                {
+                    inverted(i, j, k) = ninetied((ninetied.width -1) - i,(ninetied.height-1) - j,k);
+                }
+            }
+        }
+        image = inverted;
+    }
+
+    if(toRotate == 2)
+    {
+        Image inverted(image.width, image.height);
+        for(int i = 0; i < image.width; ++i)
+        {
+            for(int j = 0; j < image.height; ++j)
+            {
+                for(int k = 0; k < image.channels; ++k)
+                {
+                    inverted(i, j, k) = image((image.width -1) - i,(image.height-1) - j,k);
+                }
+            }
+        }
+        image = inverted;
+    }
+
+    if(toRotate == 3)
+    {
+        Image inverted(image.height, image.width);
+        for(int i = image.width -1 ; i>=0; --i)
+        {
+            for(int j = image.height -1; j>=0; --j)
+            {
+                for(int k = 0; k < image.channels; ++k)
+                {
+                    inverted(j , i ,k) = image(i, j, k);
+                }
+            }
+        }
+        image = inverted;
+    }
+}
+
 
 void detect_edges(Image& image) //By Eyad Tamer Naguib: 20230074
 {
