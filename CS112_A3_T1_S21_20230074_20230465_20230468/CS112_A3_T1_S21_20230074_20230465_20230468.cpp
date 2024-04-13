@@ -17,8 +17,78 @@ Purpose: This is a program that allows the user to load an image, apply filters 
 #include "Image_Class.h"
 using namespace std;
 
+void grayscale(Image& image)        //By Eyad Tamer Naguib: 20230074
+{
+    for(int i = 0; i<image.width;i++)
+    {
+        for(int j = 0; j<image.height;j++)
+        {
+            unsigned int avg = 0;
+            // accumulate the pixels value
+            for(int k = 0; k<image.channels;k++)
+            {
+                avg += image(i,j,k);
+            }
+            // calculate the average
+            avg/= 3;
+            for(int k = 0;k<3;k++)
+            {
+                // changing all the colors to the average
+                image.setPixel(i,j,k,avg);
+            }
 
-Image resize_image_for_merge(Image &image, int newWidth, int newHeight)
+        }
+    }
+}
+void convertToBlackandWhite(Image& image)      //By Yassin Ahmed Ali: 20230465
+{
+    for(int i = 0; i<image.width;i++)
+    {
+        for(int j = 0; j<image.height;j++)
+        {
+            unsigned int avg = 0;
+            // accumulate the pixels value
+            for(int k = 0; k<image.channels;k++)
+            {
+                avg += image(i,j,k);
+            }
+            // calculate the average
+            avg/= 3;
+            for(int k = 0;k<3;k++)
+            {
+                // checking the brightness of each pixel to see if we will change the color to black or white
+                if(avg < 128)
+                {
+                    // changing all the colors to black
+                    image.setPixel(i,j,k,0);
+                }
+                else
+                {
+                    // changing all the colors to white
+                    image.setPixel(i,j,k,255);
+
+                }
+            }
+
+        }
+    }
+}
+
+void invertImageColor(Image& image)     //By: Yaseen El-Olemy(20230468)
+{
+    for(int i =0; i < image.width; ++i)
+    {
+        for(int j = 0; j < image.height; ++j)
+        {
+            for(int k =0; k<image.channels; ++k)
+            {
+                image(i, j, k) = 255 - image(i, j, k);
+            }
+        }
+    }
+}
+
+Image resize_image_for_merge(Image &image, int newWidth, int newHeight) // Function to resize the image for merging
 {
 
     // Create a new Image object with the specified width and height
@@ -44,37 +114,8 @@ Image resize_image_for_merge(Image &image, int newWidth, int newHeight)
     return newImage;
 
 }
-
-void blurImage(Image& image)    //By: Yaseen El-Olemy(20230468)
+void mergeImages(Image& image1)     //By Eyad Tamer Naguib: 20230074
 {
-    int avg = 0;
-    Image blurred(image.width, image.height);
-    for(int i = 3; i < image.width - 2; ++i)
-    {
-        for(int j = 3; j < image.height - 2; ++j)
-        {
-            for(int k = 0; k < image.channels; k++)
-            {
-                avg = 0;
-                avg += image(i-1,j-1,k);
-                avg += image(i-1,j,k);
-                avg += image(i-1,j+1,k);
-                avg += image(i,j-1,k);
-                avg += image(i,j,k);
-                avg += image(i,j+1,k);
-                avg += image(i+1,j-1,k);
-                avg += image(i+1,j,k);
-                avg += image(i+1,j+1,k);
-
-                avg = avg/9;
-                blurred(i,j,k)= avg;
-            }
-        }
-    }
-    image = blurred;
-}
-
-void mergeImages(Image& image1) {
     string image2_name;
     cout << "Please enter the directory or the name of the second image you want to merge with the first image\n";
     cout<<"with the format .jpg, .bmp, .png, .tga: ";
@@ -130,159 +171,8 @@ void mergeImages(Image& image1) {
     }
 }
 
-void purpleFilter(Image &image) {   //By Eyad Tamer Naguib: 20230074
-    for (int i = 0; i < image.width; ++i) {
-        for (int j = 0; j < image.height; ++j) {
-            // Get the original colors of the pixel
-            int red = image.getPixel(i, j, 0);
-            int blue = image.getPixel(i, j, 2);
-
-            // Add purple tint
-            red += 128;  // Increase red
-            blue += 128; // Increase blue
-
-            // Ensure color values are within valid range (0-255)
-            red = min(255, max(0, red));
-            blue = min(255, max(0, blue));
-
-            // Set the new colors of the pixel
-            image.setPixel(i, j, 0, red);
-            image.setPixel(i, j, 2, blue);
-        }
-    }
-}
-
-void rotateImage(Image& image)     //By: Yaseen El-Olemy(20230468)
+void flipImage(Image& image)    //By Yassin Ahmed Ali: 20230465
 {
-    int toRotate;       //placeholder to specify
-    cout<<"to rotate 90 Degrees Clockwise[1]\nto rotate 180 Degrees[2]\nto rotate 270 Degrees Clockwise[3]\n-> ";
-    cin>>toRotate;
-    string newname;
-    cout<<"Enter name to save file in (or same to save in same file) with the format .jpg, .bmp, .png, .tga: ";
-    cin>>newname;
-
-    if(toRotate == 1)
-    {
-
-        Image ninetied(image.height, image.width);
-        for(int i = image.width -1 ; i>=0; --i)
-        {
-            for(int j = image.height -1; j>=0; --j)
-            {
-                for(int k = 0; k < image.channels; ++k)
-                {
-                    ninetied(j , i ,k) = image(i, j, k);
-                }
-            }
-        }
-        Image inverted(ninetied.width, ninetied.height);
-        for(int i = 0; i < ninetied.width; ++i)
-        {
-            for(int j = 0; j < ninetied.height; ++j)
-            {
-                for(int k = 0; k < ninetied.channels; ++k)
-                {
-                    inverted(i, j, k) = ninetied((ninetied.width -1) - i,(ninetied.height-1) - j,k);
-                }
-            }
-        }
-        image = inverted;
-    }
-
-    if(toRotate == 2)
-    {
-        Image inverted(image.width, image.height);
-        for(int i = 0; i < image.width; ++i)
-        {
-            for(int j = 0; j < image.height; ++j)
-            {
-                for(int k = 0; k < image.channels; ++k)
-                {
-                    inverted(i, j, k) = image((image.width -1) - i,(image.height-1) - j,k);
-                }
-            }
-        }
-        image = inverted;
-    }
-
-    if(toRotate == 3)
-    {
-        Image inverted(image.height, image.width);
-        for(int i = image.width -1 ; i>=0; --i)
-        {
-            for(int j = image.height -1; j>=0; --j)
-            {
-                for(int k = 0; k < image.channels; ++k)
-                {
-                    inverted(j , i ,k) = image(i, j, k);
-                }
-            }
-        }
-        image = inverted;
-    }
-}
-
-void addFrame(Image &image)     //By: Yaseen El-Olemy(20230468)
-{
-   int bordersize = image.width * 0.1;
-   Image newimage(image.width + bordersize, image.height + bordersize);
-   int color=0;
-   while(color<1 || color >3)
-    {
-   cout<<"Enter color of frame[1.red/2.green/3.blue]: ";
-   cin>>color;
-   if(color<1 || color > 3)
-   {
-       cout<<"ERROR: invalid input"<<endl;
-   }
-    }
-   --color;
-   for(int i =0; i<image.width + bordersize; ++i)
-   {
-       for(int j = 0; j<image.height + bordersize; ++j)
-       {
-                if(i <= bordersize / 2 || j <= bordersize / 2 || i >= image.width + (bordersize / 2) || j >= image.width + (bordersize / 2))
-                {
-                    newimage(i,j,color) = 255;
-                }
-                else
-                {
-                    for(int k = 0; k < image.channels; ++k)
-                        newimage(i,j,k) = image(i - (bordersize / 2) - 1, j - (bordersize / 2) - 1, k);
-                }
-
-       }
-   }
-   image = newimage;
-}
-
-void detect_edges(Image& image) //By Eyad Tamer Naguib: 20230074
-{
-    for(int i = 0; i<image.width;i++)
-    {
-        for(int j = 0; j<image.height;j++)
-        {
-            for(int k = 0;k<3;k++)
-            {
-                // Get the current color value
-                unsigned int color = image(i,j,k);
-                // Get the color value of the pixel to the right
-                unsigned int right = image(i+1,j,k);
-                // Get the color value of the pixel below
-                unsigned int below = image(i,j+1,k);
-                // Calculate the difference between the current pixel and the pixel to the right
-                int diff1 = abs((int)color - (int)right);
-                // Calculate the difference between the current pixel and the pixel below
-                int diff2 = abs((int)color - (int)below);
-                // Set the pixel to black if the difference is greater than 50, otherwise set it to white
-                image.setPixel(i,j,k,(diff1 > 50 || diff2 > 50) ? 0 : 255);
-            }
-        }
-    }
-}
-
-
-void flipImage(Image& image) {  //By Yassin Ahmed Ali: 20230465
     int flipOption;
     cout << "Please choose a flip option:" << endl;
     cout << "1. Flip the image horizontally" << endl;
@@ -325,41 +215,79 @@ void flipImage(Image& image) {  //By Yassin Ahmed Ali: 20230465
     }
 }
 
-void invertImageColor(Image& image)     //By: Yaseen El-Olemy(20230468)
+void rotateImage(Image& image)     //By Yaseen El-Olemy: 20230468
 {
-    for(int i =0; i < image.width; ++i)
+    int rotateOption;
+    cout << "Please choose a rotation option:" << endl;
+    cout << "1. Rotate 90 degrees clockwise" << endl;
+    cout << "2. Rotate 180 degrees" << endl;
+    cout << "3. Rotate 270 degrees clockwise" << endl;
+
+    // Loop until a valid input is given
+    while (!(cin >> rotateOption) || (rotateOption < 1 || rotateOption > 3))
     {
-        for(int j = 0; j < image.height; ++j)
-        {
-            for(int k =0; k<image.channels; ++k)
-            {
-                image(i, j, k) = 255 - image(i, j, k);
-            }
-        }
+        cout << "Invalid option. Please try again." << endl;
+        // Clear the error flags
+        cin.clear();
+        // Ignore the rest of the line
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
     }
-}
 
-void grayscale(Image& image) //By Eyad Tamer Naguib: 20230074
-{
-    for(int i = 0; i<image.width;i++)
+    if(rotateOption == 1)
     {
-        for(int j = 0; j<image.height;j++)
+        Image ninetied(image.height, image.width);
+        for(int i = image.width -1 ; i>=0; --i)
         {
-            unsigned int avg = 0;
-            // accumulate the pixels value
-            for(int k = 0; k<image.channels;k++)
+            for(int j = image.height -1; j>=0; --j)
             {
-                avg += image(i,j,k);
+                for(int k = 0; k < image.channels; ++k)
+                {
+                    ninetied(j , i ,k) = image(i, j, k);
+                }
             }
-            // calculate the average
-            avg/= 3;
-            for(int k = 0;k<3;k++)
-            {
-                // changing all the colors to the average
-                image.setPixel(i,j,k,avg);
-            }
-
         }
+        Image inverted(ninetied.width, ninetied.height);
+        for(int i = 0; i < ninetied.width; ++i)
+        {
+            for(int j = 0; j < ninetied.height; ++j)
+            {
+                for(int k = 0; k < ninetied.channels; ++k)
+                {
+                    inverted(i, j, k) = ninetied((ninetied.width -1) - i,(ninetied.height-1) - j,k);
+                }
+            }
+        }
+        image = inverted;
+    }
+    else if(rotateOption == 2)
+    {
+        Image inverted(image.width, image.height);
+        for(int i = 0; i < image.width; ++i)
+        {
+            for(int j = 0; j < image.height; ++j)
+            {
+                for(int k = 0; k < image.channels; ++k)
+                {
+                    inverted(i, j, k) = image((image.width -1) - i,(image.height-1) - j,k);
+                }
+            }
+        }
+        image = inverted;
+    }
+    else if(rotateOption == 3)
+    {
+        Image ninetied(image.height, image.width);
+        for(int i = image.width -1 ; i>=0; --i)
+        {
+            for(int j = image.height -1; j>=0; --j)
+            {
+                for(int k = 0; k < image.channels; ++k)
+                {
+                    ninetied(j , i ,k) = image(i, j, k);
+                }
+            }
+        }
+        image = ninetied;
     }
 }
 
@@ -404,40 +332,6 @@ void darken_and_lighten(Image& image) //By Eyad Tamer Naguib: 20230074
     }
 }
 
-void convertToBlackandWhite(Image& image) //By Yassin Ahmed Ali: 20230465
-{
-    for(int i = 0; i<image.width;i++)
-    {
-        for(int j = 0; j<image.height;j++)
-        {
-            unsigned int avg = 0;
-            // accumulate the pixels value
-            for(int k = 0; k<image.channels;k++)
-            {
-                avg += image(i,j,k);
-            }
-            // calculate the average
-            avg/= 3;
-            for(int k = 0;k<3;k++)
-            {
-                // checking the brightness of each pixel to see if we will change the color to black or white
-                if(avg < 128)
-                {
-                    // changing all the colors to black
-                    image.setPixel(i,j,k,0);
-                }
-                else
-                {
-                    // changing all the colors to white
-                    image.setPixel(i,j,k,255);
-
-                }
-            }
-
-        }
-    }
-}
-
 void crop(Image &image)   // By Yassin Ahmed Ali: 20230465
 {
     int x, y,width,height;
@@ -468,6 +362,66 @@ void crop(Image &image)   // By Yassin Ahmed Ali: 20230465
     }
     image = newImage;
 }
+
+void addFrame(Image &image)     //By: Yaseen El-Olemy(20230468)
+{
+    int bordersize = image.width * 0.1;
+    Image newimage(image.width + bordersize, image.height + bordersize);
+    int color=0;
+    while(color<1 || color >3)
+    {
+        cout<<"Enter color of frame[1.red/2.green/3.blue]: ";
+        cin>>color;
+        if(color<1 || color > 3)
+        {
+            cout<<"ERROR: invalid input"<<endl;
+        }
+    }
+    --color;
+    for(int i =0; i<image.width + bordersize; ++i)
+    {
+        for(int j = 0; j<image.height + bordersize; ++j)
+        {
+            if(i <= bordersize / 2 || j <= bordersize / 2 || i >= image.width + (bordersize / 2) || j >= image.width + (bordersize / 2))
+            {
+                newimage(i,j,color) = 255;
+            }
+            else
+            {
+                for(int k = 0; k < image.channels; ++k)
+                    newimage(i,j,k) = image(i - (bordersize / 2) - 1, j - (bordersize / 2) - 1, k);
+            }
+
+        }
+    }
+    image = newimage;
+}
+
+void detect_edges(Image& image) //By Eyad Tamer Naguib: 20230074
+{
+    for(int i = 0; i<image.width;i++)
+    {
+        for(int j = 0; j<image.height;j++)
+        {
+            for(int k = 0;k<3;k++)
+            {
+                // Get the current color value
+                unsigned int color = image(i,j,k);
+                // Get the color value of the pixel to the right
+                unsigned int right = image(i+1,j,k);
+                // Get the color value of the pixel below
+                unsigned int below = image(i,j+1,k);
+                // Calculate the difference between the current pixel and the pixel to the right
+                int diff1 = abs((int)color - (int)right);
+                // Calculate the difference between the current pixel and the pixel below
+                int diff2 = abs((int)color - (int)below);
+                // Set the pixel to black if the difference is greater than 50, otherwise set it to white
+                image.setPixel(i,j,k,(diff1 > 50 || diff2 > 50) ? 0 : 255);
+            }
+        }
+    }
+}
+
 void resize(Image &image) //By Yassin Ahmed Ali: 20230465
 {
 
@@ -506,8 +460,61 @@ void resize(Image &image) //By Yassin Ahmed Ali: 20230465
 
 }
 
+void blurImage(Image& image)    //By: Yaseen El-Olemy(20230468)
+{
+    int avg = 0;
+    Image blurred(image.width, image.height);
+    for(int i = 3; i < image.width - 2; ++i)
+    {
+        for(int j = 3; j < image.height - 2; ++j)
+        {
+            for(int k = 0; k < image.channels; k++)
+            {
+                avg = 0;
+                avg += image(i-1,j-1,k);
+                avg += image(i-1,j,k);
+                avg += image(i-1,j+1,k);
+                avg += image(i,j-1,k);
+                avg += image(i,j,k);
+                avg += image(i,j+1,k);
+                avg += image(i+1,j-1,k);
+                avg += image(i+1,j,k);
+                avg += image(i+1,j+1,k);
 
-void InfraredFilter(Image& image) { //By Yassin Ahmed Ali: 20230465
+                avg = avg/9;
+                blurred(i,j,k)= avg;
+            }
+        }
+    }
+    image = blurred;
+}
+
+// Bonus Filters
+void purpleFilter(Image &image)     //By Eyad Tamer Naguib: 20230074
+{
+    for (int i = 0; i < image.width; ++i) {
+        for (int j = 0; j < image.height; ++j) {
+            // Get the original colors of the pixel
+            int red = image.getPixel(i, j, 0);
+            int blue = image.getPixel(i, j, 2);
+
+            // Add purple tint
+            red += 128;  // Increase red
+            blue += 128; // Increase blue
+
+            // Ensure color values are within valid range (0-255)
+            red = min(255, max(0, red));
+            blue = min(255, max(0, blue));
+
+            // Set the new colors of the pixel
+            image.setPixel(i, j, 0, red);
+            image.setPixel(i, j, 2, blue);
+        }
+    }
+}
+
+void InfraredFilter(Image& image)   //By Yassin Ahmed Ali: 20230465
+{
 
     for (int i = 0; i < image.width; i++) {
         for (int j = 0; j < image.height; j++) {
@@ -595,20 +602,20 @@ int main()
                     break;
                 }
                 cout << "Please choose a filter to apply:" << endl;
-                cout << "1. Flip the image" << endl;
-                cout << "2. Darken or lighten the image" << endl;
-                cout << "3. Convert the image to black and white" << endl;
-                cout << "4. Invert the color of the image" << endl;
-                cout << "5. Convert the image to grayscale" << endl;
-                cout << "6. Detect edges in the image" << endl;
-                cout << "7. Merge the image with another image" << endl;
-                cout << "8. Apply a purple filter to the image" << endl;
-                cout<< "9. Crop Image" <<endl;
-                cout<< "10. Resize Image" << endl;
-                cout<<"11. Apply Infrared Filter" << endl;
-                cout<<"12. Rotate image"<<endl;
-                cout<<"13. Add frame"<<endl;
-                cout<<"14. Blur image"<<endl;
+                cout << "1. Convert the image to grayscale" << endl;
+                cout << "2. Convert the image to black and white" << endl;
+                cout << "3. Invert the color of the image" << endl;
+                cout << "4. Merge the image with another image" << endl;
+                cout << "5. Flip the image" << endl;
+                cout << "6. Rotate the image" << endl;
+                cout << "7. Darken or lighten the image" << endl;
+                cout << "8. Crop the image" << endl;
+                cout << "9. Resize the image" << endl;
+                cout << "10. Blur the image" << endl;
+                cout << "11. Add frame to the image" << endl;
+                cout << "12. Detect edges in the image" << endl;
+                cout << "13. Apply a purple filter to the image" << endl;
+                cout << "14. Apply Infrared Filter to the image" << endl;
                 // the rest of the filters
                 int filterOption;
                 // Loop until a valid input is given
@@ -624,48 +631,47 @@ int main()
                 switch (filterOption)
                 {
                     case 1:
-                        flipImage(*image);
-                        break;
-                    case 2:
-                        darken_and_lighten(*image);
-                        break;
-                    case 3:
-                        convertToBlackandWhite(*image);
-                        break;
-                    case 4:
-                        invertImageColor(*image);
-                        break;
-                    case 5:
                         grayscale(*image);
                         break;
-                    case 6:
-                        detect_edges(*image);
+                    case 2:
+                        convertToBlackandWhite(*image);
                         break;
-                    case 7:
+                    case 3:
+                        invertImageColor(*image);
+                        break;
+                    case 4:
                         mergeImages(*image);
                         break;
-                    case 8:
-                        purpleFilter(*image);
+                    case 5:
+                        flipImage(*image);
                         break;
-                    case 9:
-                        crop(*image);
-                        break;
-                    case 10:
-                        resize(*image);
-                        break;
-                    case 11:
-                        InfraredFilter(*image);
-                        break;
-                    case 12:
+                    case 6:
                         rotateImage(*image);
                         break;
-                    case 13:
-                        addFrame(*image);
+                    case 7:
+                        darken_and_lighten(*image);
                         break;
-                    case 14:
+                    case 8:
+                        crop(*image);
+                        break;
+                    case 9:
+                        resize(*image);
+                        break;
+                    case 10:
                         blurImage(*image);
                         break;
-
+                    case 11:
+                        addFrame(*image);
+                        break;
+                    case 12:
+                        detect_edges(*image);
+                        break;
+                    case 13:
+                        purpleFilter(*image);
+                        break;
+                    case 14:
+                        InfraredFilter(*image);
+                        break;
                 }
                 cout<<"Filter applied successfully!"<<endl;
                 break;
