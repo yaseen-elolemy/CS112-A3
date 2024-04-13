@@ -462,38 +462,46 @@ void resize(Image &image) //By Yassin Ahmed Ali: 20230465
 
 void blurImage(Image& image)    //By: Yaseen El-Olemy(20230468)
 {
-    int avg = 0;
-    Image blurred(image.width, image.height);
-    for(int i = 0; i < image.width; ++i)
-    {
-        for(int j = 0; j < image.height; ++j)
+    int blurlevel = 0;
+    while(blurlevel < 1 || blurlevel > 3) {
+        cout<<"Choose degree of blur[1.low/2.medium/3.high]: ";
+        cin >> blurlevel;
+        if(blurlevel < 1 || blurlevel > 3)
         {
-            if(i == 0 || j == 0 || i == (image.width - 1) || j == (image.height - 1))
-            {
-                blurred(i,j,0) = 0;
-                blurred(i,j,1) = 1;
-                blurred(i,j,2) = 2;
-            }
-            else {
-                for (int k = 0; k < 3; k++) {
-                    avg = 0;
-                    avg += image(i - 1, j - 1, k);
-                    avg += image(i - 1, j, k);
-                    avg += image(i - 1, j + 1, k);
-                    avg += image(i, j - 1, k);
-                    avg += image(i, j, k);
-                    avg += image(i, j + 1, k);
-                    avg += image(i + 1, j - 1, k);
-                    avg += image(i + 1, j, k);
-                    avg += image(i + 1, j + 1, k);
+            cout<<"ERROR: INCORRECT CHOICE, please try again..."<<endl;
+        }
+    }
+    while(blurlevel>0) {
+        int avg = 0;
+        Image blurred(image.width, image.height);
+        for (int i = 0; i < image.width; ++i) {
+            for (int j = 0; j < image.height; ++j) {
+                if (i == 0 || j == 0 || i == (image.width - 1) || j == (image.height - 1)) {
+                    blurred(i, j, 0) = 0;
+                    blurred(i, j, 1) = 1;
+                    blurred(i, j, 2) = 2;
+                } else {
+                    for (int k = 0; k < 3; k++) {
+                        avg = 0;
+                        avg += image(i - 1, j - 1, k);
+                        avg += image(i - 1, j, k);
+                        avg += image(i - 1, j + 1, k);
+                        avg += image(i, j - 1, k);
+                        avg += image(i, j, k);
+                        avg += image(i, j + 1, k);
+                        avg += image(i + 1, j - 1, k);
+                        avg += image(i + 1, j, k);
+                        avg += image(i + 1, j + 1, k);
 
-                    avg = avg / 9;
-                    blurred(i, j, k) = avg;
+                        avg = avg / 9;
+                        blurred(i, j, k) = avg;
+                    }
                 }
             }
         }
+        image = blurred;
+        --blurlevel;
     }
-    image = blurred;
 }
 
 // Bonus Filters
