@@ -518,9 +518,9 @@ void InfraredFilter(Image& image)   //By Yassin Ahmed Ali: 20230465
 
     for (int i = 0; i < image.width; i++) {
         for (int j = 0; j < image.height; j++) {
-            image(i, j, 0) = min(image(i, j, 0) + 200, 255);
-            image(i, j, 1) = min(image(i, j, 1) + 50, 255);
-            image(i, j, 2) = min(image(i, j, 2) + 50, 255);
+            image(i, j, 0) = min(image(i, j, 0) + 250, 255);
+            image(i, j, 1) = min(image(i, j, 1) + 20, 255);
+            image(i, j, 2) = min(image(i, j, 2) + 20, 255);
         }
     }
 }
