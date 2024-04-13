@@ -366,7 +366,7 @@ void crop(Image &image)   // By Yassin Ahmed Ali: 20230465
 void addFrame(Image &image)     //By: Yaseen El-Olemy(20230468)
 {
     int bordersize = image.width * 0.1;
-    Image newimage(image.width + bordersize, image.height + bordersize);
+    Image newimage(image.width + bordersize , image.height +bordersize);
     int color=0;
     while(color<1 || color >3)
     {
@@ -382,13 +382,13 @@ void addFrame(Image &image)     //By: Yaseen El-Olemy(20230468)
     {
         for(int j = 0; j<image.height + bordersize; ++j)
         {
-            if(i <= bordersize / 2 || j <= bordersize / 2 || i >= image.width + (bordersize / 2) || j >= image.width + (bordersize / 2))
+            if(i <= bordersize / 2 || j <= bordersize / 2 || i > image.width + (bordersize / 2) || j > image.height + (bordersize / 2))
             {
                 newimage(i,j,color) = 255;
             }
             else
             {
-                for(int k = 0; k < image.channels; ++k)
+                for(int k = 0; k < 3; ++k)
                     newimage(i,j,k) = image(i - (bordersize / 2) - 1, j - (bordersize / 2) - 1, k);
             }
 
@@ -464,25 +464,32 @@ void blurImage(Image& image)    //By: Yaseen El-Olemy(20230468)
 {
     int avg = 0;
     Image blurred(image.width, image.height);
-    for(int i = 3; i < image.width - 2; ++i)
+    for(int i = 0; i < image.width; ++i)
     {
-        for(int j = 3; j < image.height - 2; ++j)
+        for(int j = 0; j < image.height; ++j)
         {
-            for(int k = 0; k < image.channels; k++)
+            if(i == 0 || j == 0 || i == (image.width - 1) || j == (image.height - 1))
             {
-                avg = 0;
-                avg += image(i-1,j-1,k);
-                avg += image(i-1,j,k);
-                avg += image(i-1,j+1,k);
-                avg += image(i,j-1,k);
-                avg += image(i,j,k);
-                avg += image(i,j+1,k);
-                avg += image(i+1,j-1,k);
-                avg += image(i+1,j,k);
-                avg += image(i+1,j+1,k);
+                blurred(i,j,0) = 0;
+                blurred(i,j,1) = 1;
+                blurred(i,j,2) = 2;
+            }
+            else {
+                for (int k = 0; k < 3; k++) {
+                    avg = 0;
+                    avg += image(i - 1, j - 1, k);
+                    avg += image(i - 1, j, k);
+                    avg += image(i - 1, j + 1, k);
+                    avg += image(i, j - 1, k);
+                    avg += image(i, j, k);
+                    avg += image(i, j + 1, k);
+                    avg += image(i + 1, j - 1, k);
+                    avg += image(i + 1, j, k);
+                    avg += image(i + 1, j + 1, k);
 
-                avg = avg/9;
-                blurred(i,j,k)= avg;
+                    avg = avg / 9;
+                    blurred(i, j, k) = avg;
+                }
             }
         }
     }
@@ -767,7 +774,6 @@ int main()
                 }
                 last:
                 // Delete the image before exiting
-                //delete image;     btedy ma3 olemy error
                 cout<<"Thank you for using our program!"<<endl;
                 return 0;
             }
