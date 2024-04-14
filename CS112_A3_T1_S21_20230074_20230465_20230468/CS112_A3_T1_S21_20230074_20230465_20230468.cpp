@@ -2,12 +2,12 @@
  File: CS112_A3_T1_S21_20230074_20230465_20230468.cpp
 
 Purpose: This is a program that allows the user to load an image, apply filters to it, and save the edited image.
-                 The filters are: rotate, invert, convert to grayscale, darken or lighten, and convert to black and white.
+                 The filters are: Add frame, Blur, rotate, invert, convert to grayscale, darken or lighten, and convert to black and white, add sunlight.
                 The user can choose to load a new image, apply a filter to the current image, save the current image, or exit the program.
 
  Author:    Eyad Tamer Naguib 20230074 - S21 -> Grayscale - Darken/Lighten - Detect Edges - purple filter - Merge Images
             Yassin Ahmed Ali 20230465 - S21 -> Flipping the image and Convert to Black and White Function
-            Yaseen Mohamed Kamal 20230468 - S21  ->  Invert the color - blur - add frame - rotate image
+            Yaseen Mohamed Kamal 20230468 - S21  ->  Invert the color - blur - add frame - rotate image - Sunlight(bonus filter)
 
  Emails: eyadmohandiss@gmail.com - yassinsawy@outlook.com - yaseen.elolemy@gmail.com
  Private repository: https://github.com/yaseen-elolemy/CS112-A3
@@ -367,7 +367,7 @@ void crop(Image &image)   // By Yassin Ahmed Ali: 20230465
 void addFrame(Image &image)     //By: Yaseen El-Olemy(20230468)
 {
     int bordersize = image.width * 0.1;
-    Image newimage(image.width + bordersize, image.height + bordersize);
+    Image newimage(image.width + bordersize , image.height +bordersize);
     int color=0;
     while(color<1 || color >3)
     {
@@ -383,13 +383,13 @@ void addFrame(Image &image)     //By: Yaseen El-Olemy(20230468)
     {
         for(int j = 0; j<image.height + bordersize; ++j)
         {
-            if(i <= bordersize / 2 || j <= bordersize / 2 || i >= image.width + (bordersize / 2) || j >= image.width + (bordersize / 2))
+            if(i <= bordersize / 2 || j <= bordersize / 2 || i > image.width + (bordersize / 2) || j > image.height + (bordersize / 2))
             {
                 newimage(i,j,color) = 255;
             }
             else
             {
-                for(int k = 0; k < image.channels; ++k)
+                for(int k = 0; k < 3; ++k)
                     newimage(i,j,k) = image(i - (bordersize / 2) - 1, j - (bordersize / 2) - 1, k);
             }
 
@@ -463,34 +463,67 @@ void resize(Image &image) //By Yassin Ahmed Ali: 20230465
 
 void blurImage(Image& image)    //By: Yaseen El-Olemy(20230468)
 {
-    int avg = 0;
-    Image blurred(image.width, image.height);
-    for(int i = 3; i < image.width - 2; ++i)
-    {
-        for(int j = 3; j < image.height - 2; ++j)
+    int blurlevel = 0;
+    while(blurlevel < 1 || blurlevel > 3) {
+        cout<<"Choose degree of blur[1.low/2.medium/3.high]: ";
+        cin >> blurlevel;
+        if(blurlevel < 1 || blurlevel > 3)
         {
-            for(int k = 0; k < image.channels; k++)
-            {
-                avg = 0;
-                avg += image(i-1,j-1,k);
-                avg += image(i-1,j,k);
-                avg += image(i-1,j+1,k);
-                avg += image(i,j-1,k);
-                avg += image(i,j,k);
-                avg += image(i,j+1,k);
-                avg += image(i+1,j-1,k);
-                avg += image(i+1,j,k);
-                avg += image(i+1,j+1,k);
-
-                avg = avg/9;
-                blurred(i,j,k)= avg;
-            }
+            cout<<"ERROR: INCORRECT CHOICE, please try again..."<<endl;
         }
     }
-    image = blurred;
+    while(blurlevel>0) {
+        int avg = 0;
+        Image blurred(image.width, image.height);
+        for (int i = 0; i < image.width; ++i) {
+            for (int j = 0; j < image.height; ++j) {
+                if (i == 0 || j == 0 || i == (image.width - 1) || j == (image.height - 1)) {
+                    blurred(i, j, 0) = 0;
+                    blurred(i, j, 1) = 1;
+                    blurred(i, j, 2) = 2;
+                } else {
+                    for (int k = 0; k < 3; k++) {
+                        avg = 0;
+                        avg += image(i - 1, j - 1, k);
+                        avg += image(i - 1, j, k);
+                        avg += image(i - 1, j + 1, k);
+                        avg += image(i, j - 1, k);
+                        avg += image(i, j, k);
+                        avg += image(i, j + 1, k);
+                        avg += image(i + 1, j - 1, k);
+                        avg += image(i + 1, j, k);
+                        avg += image(i + 1, j + 1, k);
+
+                        avg = avg / 9;
+                        blurred(i, j, k) = avg;
+                    }
+                }
+            }
+        }
+        image = blurred;
+        --blurlevel;
+    }
 }
 
 // Bonus Filters
+
+void sunlight(Image &image)     //By: Yaseen El-Olemy(20230468)
+{
+    for (int i = 0; i < image.width; ++i) {
+        for (int j = 0; j < image.height; ++j) {
+            int red = image.getPixel(i, j, 0);
+            int green = image.getPixel(i, j, 1);
+            red += 50;  
+            green += 50;
+            red = min(255, max(0, red));
+            green = min(255, max(0, green));
+            image.setPixel(i, j, 0, red);
+            image.setPixel(i, j, 1, green);
+        }
+    }
+
+}
+
 void purpleFilter(Image &image)     //By Eyad Tamer Naguib: 20230074
 {
     for (int i = 0; i < image.width; ++i) {
@@ -587,7 +620,8 @@ int main()
                 }
                 cout << "Please enter the directory or the name of the image you want to edit\n";
                 cout<<"with the format .jpg, .bmp, .png, .tga:"<<endl;
-                cin >> image_name;
+                cin.ignore();
+                getline(cin, image_name);
                 // Delete the old image if it exists
                 delete image;
                 // Load the new image
@@ -617,10 +651,11 @@ int main()
                 cout << "12. Detect edges in the image" << endl;
                 cout << "13. Apply a purple filter to the image" << endl;
                 cout << "14. Apply Infrared Filter to the image" << endl;
+                cout << "15. Apply sunlight filter to the image" << endl;
                 // the rest of the filters
                 int filterOption;
                 // Loop until a valid input is given
-                while (!(cin >> filterOption) || (filterOption < 1 || filterOption > 14))
+                while (!(cin >> filterOption) || (filterOption < 1 || filterOption > 15))
                 {
                     cout << "Invalid option. Please try again." << endl;
                     // Clear the error flags
@@ -672,6 +707,9 @@ int main()
                         break;
                     case 14:
                         InfraredFilter(*image);
+                        break;
+                    case 15:
+                        sunlight(*image);
                         break;
                 }
                 cout<<"Filter applied successfully!"<<endl;
@@ -760,7 +798,8 @@ int main()
                         else if (saveOption == "new")
                         {
                             cout << "Enter the directory and name of the photo you want to save with the format .jpg, .bmp, .png, .tga: ";
-                            cin >> image_name;
+                            cin.ignore();
+                            getline(cin, image_name);
                             image->saveImage(image_name);
                             cout << "Image saved successfully!" << endl;
                         }
@@ -768,7 +807,6 @@ int main()
                 }
                 last:
                 // Delete the image before exiting
-                //delete image;     btedy ma3 olemy error
                 cout<<"Thank you for using our program!"<<endl;
                 return 0;
             }
