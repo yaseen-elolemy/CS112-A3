@@ -5,11 +5,12 @@ Purpose: This is a program that allows the user to load an image, apply filters 
                  The filters are: rotate, invert, convert to grayscale, darken or lighten, and convert to black and white.
                 The user can choose to load a new image, apply a filter to the current image, save the current image, or exit the program.
 
- Author:    Eyad Tamer Naguib 20230074 - S21 -> Grayscale - Darken/Lighten - Detect Edges - purple filter - Merge Images Functions
+ Author:    Eyad Tamer Naguib 20230074 - S21 -> Grayscale - Darken/Lighten - Detect Edges - purple filter - Merge Images
             Yassin Ahmed Ali 20230465 - S21 -> Flipping the image and Convert to Black and White Function
             Yaseen Mohamed Kamal 20230468 - S21  ->  Invert the color - blur - add frame - rotate image
 
  Emails: eyadmohandiss@gmail.com - yassinsawy@outlook.com - yaseen.elolemy@gmail.com
+ Private repository: https://github.com/yaseen-elolemy/CS112-A3
 
  */
 
